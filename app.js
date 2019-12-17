@@ -3,8 +3,8 @@ const app = express();
 const hbs = require('hbs');
 const path = require('path');
 const multer =  require('multer');
-const bodyParser = require('body-parser');
 const jimp = require('jimp');
+const fs = require('fs');
 let fileName;
 
 app.use(express.static(path.join(__dirname + '/public')));
@@ -26,7 +26,7 @@ const upload = multer({
 
 
 
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(express.urlencoded({extended:true}));
 
 //app.use(express.json());
 
@@ -38,6 +38,25 @@ app.get('/', (req, res)=>res.render('index'));
 app.post('/new-contact', (req, res)=>{
     upload(req,res, () => {
         //TBD
+        let contact = { name: req.body.name,
+                        email: req.body.email,
+                        avatar: fileName};
+        let contactList = [];
+
+        fs.exists('public/contact-data.dat',exist=>{
+            console.log(exist);
+            if(exist){
+            contactList = JSON.parse(fs.readFileSync('public/contact-data.dat'));
+            console.log(contactList);
+        }
+        contactList.push(contact);
+        console.log(contactList);
+        fs.writeFileSync('public/contact-data.dat', JSON.stringify(contactList),(err)=>{throw err});
+    });
+            
+        
+        
+        
 
         jimp.read('public/uploads/' + fileName, (err, image)=>{
             if(err) throw err;
@@ -46,11 +65,12 @@ app.post('/new-contact', (req, res)=>{
                 .quality(60)
                 .write('public/uploads/' + fileName);
         });
+       
+        
+        res.send(`Your contact ${req.body.name} is created!`);
     });
     //Jimp does not work on here
 
-    
-    res.send(`Your contact ${req.body.name} is created!`)
 });
 
 //server listens 3000 port
