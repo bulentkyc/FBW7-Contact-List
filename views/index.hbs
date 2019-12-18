@@ -77,15 +77,17 @@ a:hover{
                         </div>
                     </form>
         <hr>
+
+{{#each contactArr}}
         <div class="container row">
             <ul class="col-xs-12 col-md-6 mx-auto ul">
                 <li class="li row">
                     <div class="float-left col-11">
                         <a href="#">
-                            <img src="/avatar.png">
-                            Bulent
+                            <img src="/uploads/{{this.avatar}}">
+                                {{this.name}}
                             <div class="float-right">
-                                bulent@kyc.com
+                                {{this.email}}
                             </div>
                         </a>
                     </div>
@@ -95,6 +97,8 @@ a:hover{
                 </li>
             </ul>
         </div>
+{{/each}}
+
     </div>
 </body>
 </html>

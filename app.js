@@ -33,7 +33,15 @@ app.use(express.urlencoded({extended:true}));
 app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/views/partial');
 
-app.get('/', (req, res)=>res.render('index'));
+app.get('/', (req, res)=>{
+    let contacts;
+    fs.exists('public/contact-data.dat',exist=>{
+        if(exist){
+            contacts = JSON.parse(fs.readFileSync('public/contact-data.dat'));
+        }
+    res.render('index',{contactArr:contacts});
+    });
+});
 
 app.post('/new-contact', (req, res)=>{
     upload(req,res, () => {
@@ -67,7 +75,7 @@ app.post('/new-contact', (req, res)=>{
         });
        
         
-        res.send(`Your contact ${req.body.name} is created!`);
+        res.redirect('/');
     });
     //Jimp does not work on here
 
