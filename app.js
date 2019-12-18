@@ -46,26 +46,19 @@ app.get('/', (req, res)=>{
 app.post('/new-contact', (req, res)=>{
     upload(req,res, () => {
         //TBD
-        let contact = { name: req.body.name,
+        let contact = { id: Date.now(), 
+                        name: req.body.name,
                         email: req.body.email,
                         avatar: fileName};
         let contactList = [];
 
         fs.exists('public/contact-data.dat',exist=>{
-            console.log(exist);
             if(exist){
             contactList = JSON.parse(fs.readFileSync('public/contact-data.dat'));
-            console.log(contactList);
         }
         contactList.push(contact);
-        console.log(contactList);
         fs.writeFileSync('public/contact-data.dat', JSON.stringify(contactList),(err)=>{throw err});
     });
-            
-        
-        
-        
-
         jimp.read('public/uploads/' + fileName, (err, image)=>{
             if(err) throw err;
             image
@@ -79,6 +72,22 @@ app.post('/new-contact', (req, res)=>{
     });
     //Jimp does not work on here
 
+});
+
+app.post('/delete-contact/:id', (req,res)=>{
+    let contactList = JSON.parse(fs.readFileSync('public/contact-data.dat'));
+    console.log(req.params.id, contactList.filter(val=>{
+        return val.id == req.params.id;
+}));
+    contactList.splice(
+        contactList.indexOf(
+            contactList.filter(val=>{
+                    return val.id == req.params.id;
+            })[0]
+        ),1
+    );
+    fs.writeFileSync('public/contact-data.dat',JSON.stringify(contactList));
+    res.redirect('/');
 });
 
 //server listens 3000 port

@@ -48,6 +48,10 @@ a:hover{
     color: white;
     text-align: center;
 }
+.btn-delete{
+    background: transparent;
+    border: none;
+}
 </style>
 <body>
     <div class="container">
@@ -91,9 +95,9 @@ a:hover{
                             </div>
                         </a>
                     </div>
-                    <div class="float-right col-1">
-                        <a href="#">❌</a>
-                    </div>
+                    <form class="float-right col-1" action="/delete-contact/{{this.id}}" method="POST">
+                        <button class="btn-delete" type="submit"> ❌ </button>
+                    </form>
                 </li>
             </ul>
         </div>
