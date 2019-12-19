@@ -99,7 +99,9 @@ a:hover{
                         <button class="btn-delete" type="submit"> ❌ </button>
                     </form>
                     <button class="btn-delete" data-toggle="modal" data-target="#editModal" 
-                    onclick="setEditModal('{{this.id}}','{{this.avatar}}','{{this.name}}','{{this.email}}')"> ✏ </button>
+                    onclick="setModal('{{this.id}}','{{this.avatar}}','{{this.name}}','{{this.email}}')"> ✏ </button>
+                    <button class="btn-delete" data-toggle="modal" data-target="#emailModal" 
+                    onclick="setModal('{{this.id}}','{{this.avatar}}','{{this.name}}','{{this.email}}')"> ✉ </button>
                 </li>
             </ul>
         </div>
@@ -130,10 +132,52 @@ a:hover{
         </div>
     </div>
 </div>
+
+
+<div class="modal fade" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header"><img class="userImg float-left" />
+                <h5 class="name modal-title text-primary"></h5><button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
+            <div class="modal-body">
+                <form class="container" action="/send-mail" method="POST" enctype="multipart/form-data">
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">to</div>
+                        </div><input class="email form-control" type="email" name="to" readonly="" /></div>
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">@</div>
+                        </div><input class="form-control" type="email" name="cc" placeholder="CC address" /></div>
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">...</div>
+                        </div><input class="form-control" type="text" name="subject" placeholder="Mail Subject" /></div>
+                    <div class="input-group mb-2"><textarea class="form-control" rows="3" name="message"></textarea></div>
+                    <div class="input-group mb-2"><label class="custom-file-label" for="attach">Choose File</label><input class="custom-file-input" id="attach" type="file" name="attach" /></div>
+                    <hr/>
+                    <div class="input-group mb-2" id="userDiv">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">@</div>
+                        </div><input class="form-control" type="email" name="user" placeholder="Your G-mail address" /></div>
+                    <div class="input-group mb-2" id="passDiv">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text"> * </div>
+                        </div><input class="form-control" type="password" name="pass" placeholder="Your G-mail password" /></div>
+                    <hr/>
+                    <div class="input-group mb-2"><button class="btn btn-primary btn-block" type="submit">Send</button></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <h5 class="text-center m-auto text-primary">© 2019 Bülent Kayici</h5>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 
 <script>
-    let setEditModal = (id, avatar, name, email) =>{
+    let setModal = (id, avatar, name, email) =>{
         $('#editForm').attr('action', `/edit-contact/${id}`); 
         $('.userImg').attr('src','/uploads/'+avatar);
         $('.name').val(name).text(name);

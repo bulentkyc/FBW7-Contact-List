@@ -5,6 +5,7 @@ const path = require('path');
 const multer =  require('multer');
 const jimp = require('jimp');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 let fileName;
 
 app.use(express.static(path.join(__dirname + '/public')));
@@ -46,6 +47,9 @@ app.get('/', (req, res)=>{
 app.post('/new-contact', (req, res)=>{
     upload(req,res, () => {
         //TBD
+        if (fileName == null) {
+            fileName = 'avatar.png';
+        }
         let contact = { id: Date.now(), 
                         name: req.body.name,
                         email: req.body.email,
@@ -67,6 +71,7 @@ app.post('/new-contact', (req, res)=>{
                 .write('public/uploads/' + fileName);
         });
        
+        fileName = null;
         
         res.redirect('/');
     });
@@ -90,30 +95,74 @@ app.post('/delete-contact/:id', (req,res)=>{
 
 app.post('/edit-contact/:id', (req,res)=>{
     upload(req,res,()=>{
-    let contactList = JSON.parse(fs.readFileSync('public/contact-data.dat'));
-    console.log(req.params.id);
-    let contactIndex = contactList.indexOf(
-        contactList.filter(val=>{
-                return val.id == req.params.id;
-        })[0]
-    );
+        
+        let contactList = JSON.parse(fs.readFileSync('public/contact-data.dat'));
+        let contactIndex = contactList.indexOf(
+            contactList.filter(val=>{
+                    return val.id == req.params.id;
+            })[0]
+        );
 
-    contactList[contactIndex].name = req.body.name;
-    contactList[contactIndex].email = req.body.email;
-    contactList[contactIndex].avatar = fileName;
+        if (fileName != null) {
+            contactList[contactIndex].avatar = fileName;
 
-    fs.writeFileSync('public/contact-data.dat',JSON.stringify(contactList));
+            jimp.read('public/uploads/' + fileName, (err, image)=>{
+                if(err) throw err;
+                image
+                    .resize(250, 250)
+                    .quality(60)
+                    .write('public/uploads/' + fileName);
+            });
+        }
 
-    jimp.read('public/uploads/' + fileName, (err, image)=>{
-        if(err) throw err;
-        image
-            .resize(250, 250)
-            .quality(60)
-            .write('public/uploads/' + fileName);
+        contactList[contactIndex].name = req.body.name;
+        contactList[contactIndex].email = req.body.email;
+        
+        fs.writeFileSync('public/contact-data.dat',JSON.stringify(contactList));
+
+        res.redirect('/');
+    });
+});
+
+app.post('/send-mail', (req,res)=>{
+    upload(req,res,()=>{
+    
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: req.body.user, // generated ethereal user
+            pass: req.body.pass // generated ethereal password
+        }
     });
 
+    // send mail with defined transport object
+    let info =  {
+        from: '"FBW7 Contact List Project 👻" <fb7@dci.com>', // sender address
+        to: req.body.to, // list of receivers
+        cc: req.body.cc,
+        subject: req.body.subject, // Subject line
+        html: "<b>"+req.body.message+"</b>", // html body
+        attachments: [{
+            filename:fileName,
+            path: 'public/uploads/' + fileName
+        }]
+    };
+
+    transporter.sendMail(info, (err,info)=>{
+        if(err){
+            console.log(err);
+        }else{
+            console.log('Message sent to : ' + info.messageId);
+        }
+    });
+    
+
+
     res.redirect('/');
-});
+    });
+
+    
 });
 
 //server listens 3000 port
