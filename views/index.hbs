@@ -98,11 +98,46 @@ a:hover{
                     <form class="float-right col-1" action="/delete-contact/{{this.id}}" method="POST">
                         <button class="btn-delete" type="submit"> ❌ </button>
                     </form>
+                    <button class="btn-delete" data-toggle="modal" data-target="#editModal" 
+                    onclick="setEditModal('{{this.id}}','{{this.avatar}}','{{this.name}}','{{this.email}}')"> ✏ </button>
                 </li>
             </ul>
         </div>
 {{/each}}
 
     </div>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header"><img class="userImg float-left" />
+                <h5 class="name modal-title text-primary"></h5><button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
+            <div class="modal-body">
+                <form id="editForm" class="col-xs-12 col-md-10 mx-auto" method="POST" enctype="multipart/form-data"><input class="idOfContact" name="id" hidden="hidden" />
+                    <div class="input-group mb-1">
+                        <div class="input-group-prepend"></div>
+                        <div class="input-group-text">...</div><input class="name form-control" type="text" name="name" placeholder="Enter your contact's name" /></div>
+                    <div class="input-group mb-1">
+                        <div class="input-group-prepend"></div>
+                        <div class="input-group-text">@</div><input class="email form-control" type="email" name="email" placeholder="Enter your contact's e-mail" /></div>
+                    <div class="input-group mb-1"><label class="custom-file-label" for="avatar">Choose file</label><input class="custom-file-input" id="avatar" type="file" name="avatar" multiple="multiple" /></div>
+                    <div class="input-group"><button class="btn btn-primary btn-block" type="submit">Submit</button></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <h5 class="text-center m-auto text-primary">© 2019 Bülent Kayici</h5>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
+
+<script>
+    let setEditModal = (id, avatar, name, email) =>{
+        $('#editForm').attr('action', `/edit-contact/${id}`); 
+        $('.userImg').attr('src','/uploads/'+avatar);
+        $('.name').val(name).text(name);
+        $('.email').val(email);
+    }
+</script>
 </html>
