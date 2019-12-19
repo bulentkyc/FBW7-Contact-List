@@ -76,9 +76,7 @@ app.post('/new-contact', (req, res)=>{
 
 app.post('/delete-contact/:id', (req,res)=>{
     let contactList = JSON.parse(fs.readFileSync('public/contact-data.dat'));
-    console.log(req.params.id, contactList.filter(val=>{
-        return val.id == req.params.id;
-}));
+    
     contactList.splice(
         contactList.indexOf(
             contactList.filter(val=>{
@@ -88,6 +86,34 @@ app.post('/delete-contact/:id', (req,res)=>{
     );
     fs.writeFileSync('public/contact-data.dat',JSON.stringify(contactList));
     res.redirect('/');
+});
+
+app.post('/edit-contact/:id', (req,res)=>{
+    upload(req,res,()=>{
+    let contactList = JSON.parse(fs.readFileSync('public/contact-data.dat'));
+    console.log(req.params.id);
+    let contactIndex = contactList.indexOf(
+        contactList.filter(val=>{
+                return val.id == req.params.id;
+        })[0]
+    );
+
+    contactList[contactIndex].name = req.body.name;
+    contactList[contactIndex].email = req.body.email;
+    contactList[contactIndex].avatar = fileName;
+
+    fs.writeFileSync('public/contact-data.dat',JSON.stringify(contactList));
+
+    jimp.read('public/uploads/' + fileName, (err, image)=>{
+        if(err) throw err;
+        image
+            .resize(250, 250)
+            .quality(60)
+            .write('public/uploads/' + fileName);
+    });
+
+    res.redirect('/');
+});
 });
 
 //server listens 3000 port
